@@ -1513,7 +1513,62 @@ run(function()
 		Visible = false
 	})
 end)
-	
+
+run(function()
+    local conn
+    vape.Categories.Render:CreateModule({
+        Name = "FullBright",
+        Function = function(on)
+            local lighting = game:GetService("Lighting")
+            if on then
+                conn = game:GetService("RunService").RenderStepped:Connect(function()
+                    lighting.Brightness = 2
+                    	lighting.ClockTime = 14
+                    		lighting.FogEnd = 1e5
+                    			lighting.GlobalShadows = false
+                    	lighting.Ambient = Color3.new(1, 1, 1)
+                    lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+                end)
+            else
+                if conn then conn:Disconnect() conn = nil end
+            end
+        end
+    })
+end)
+
+run(function()
+    local conn, pad
+    vape.Categories.World:CreateModule({
+        Name = "Jesus",
+        Function = function(on)
+            if on then
+                local lp = game:GetService("Players").LocalPlayer
+                local rs = game:GetService("RunService")
+                local params = RaycastParams.new()
+                pad = Instance.new("Part")
+                pad.Anchored, pad.CanCollide, pad.Size, pad.Transparency = true, true, Vector3.new(6,0.25,6), 1
+                pad.Name = "WaterFollow"; pad.Parent = workspace
+
+                conn = rs.RenderStepped:Connect(function()
+                    local char = lp.Character; local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if not hrp then return end
+                    params.FilterType = Enum.RaycastFilterType.Blacklist
+                    params.FilterDescendantsInstances = {char, pad}
+                    local hit = workspace:Raycast(hrp.Position, Vector3.new(0, -100, 0), params)
+                    if hit and hit.Material == Enum.Material.Water then
+                        pad.Position = Vector3.new(hrp.Position.X, hit.Position.Y + 0.125, hrp.Position.Z)
+                    else
+                        pad.Position = Vector3.new(0, -999, 0)
+                    end
+                end)
+            else
+                if conn then conn:Disconnect() conn = nil end
+                if pad then pad:Destroy() pad = nil end
+            end
+        end
+    })
+end)
+																																											
 run(function()
 	local TriggerBot
 	local Targets
